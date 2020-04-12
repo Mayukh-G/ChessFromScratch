@@ -53,7 +53,7 @@ piece.prototype.show = function(h, mouseover){
     strokeWeight(3);
     stroke(255,200,0);
   }
-  switch(this.type){ /*---USE BEGIN SHAPE LATER ON TO MAKE THEM LOOK BETTER */
+  switch(this.type){ /* GHOST PROJECTION NOT TO BE USED OUTSIDE OF CLASS */
     case 'p':
       rect(h*(this.x + 1/2), h*(this.y + 1/2), 20,20)
       break;
@@ -113,7 +113,7 @@ piece.prototype.fMove = function(h, board){
     case 'p':
     var possible = []
     var blocked = false
-      if(this.alliance){
+      if(this.alliance){ //WHITE
         if(board[this.x][this.y-1].occ.length > 0){
           blocked = true
         }
@@ -127,9 +127,19 @@ piece.prototype.fMove = function(h, board){
               append(possible, [this.x, this.y-2])
             }
           }
+        }//CAPTURE
+        if(this.x+1 <= 7){
+          if(board[this.x+1][this.y-1].occ.length > 0 && !board[this.x+1][this.y-1].occ[0].alliance){
+            append(possible, [this.x+1, this.y-1, true])
+          }
+        }
+        if(this.x-1 >= 0){
+          if (board[this.x-1][this.y-1].occ.length > 0 && !board[this.x-1][this.y-1].occ[0].alliance) {
+            append(possible, [this.x-1, this.y-1, true])
+          }
         }
       }
-      else if (!this.alliance) {
+      else if (!this.alliance) { //BLACK
         if(board[this.x][this.y+1].occ.length > 0){
           blocked = true
         }
@@ -142,6 +152,16 @@ piece.prototype.fMove = function(h, board){
             if (!blocked){
               append(possible, [this.x, this.y+2])
             }
+          }
+        }//CAPTURE
+        if(this.x+1 <= 7){
+          if(board[this.x+1][this.y+1].occ.length > 0 && board[this.x+1][this.y+1].occ[0].alliance){
+            append(possible, [this.x+1, this.y+1, true])
+          }
+        }
+        if(this.x-1 >= 0){
+          if (board[this.x-1][this.y+1].occ.length > 0 && board[this.x-1][this.y+1].occ[0].alliance) {
+            append(possible, [this.x-1, this.y+1, true])
           }
         }
       }
@@ -158,6 +178,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [this.x-i, this.y])
+        }else if(this.alliance != board[this.x-i][this.y].occ[0].alliance){
+          append(possible, [this.x-i, this.y, true])
         }
       }
       blocked = false
@@ -168,6 +190,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [this.x+i, this.y])
+        }else if(this.alliance != board[this.x+i][this.y].occ[0].alliance){
+          append(possible, [this.x+i, this.y, true])
         }
       }
       blocked = false
@@ -178,6 +202,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [this.x, this.y-i])
+        }else if(this.alliance != board[this.x][this.y-i].occ[0].alliance){
+          append(possible, [this.x, this.y-i, true])
         }
       }
       blocked = false
@@ -188,6 +214,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [this.x, this.y+i])
+        }else if(this.alliance != board[this.x][this.y+i].occ[0].alliance){
+          append(possible, [this.x, this.y+i, true])
         }
       }
       return(possible)
@@ -207,6 +235,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -219,6 +249,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -231,6 +263,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -243,6 +277,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -255,6 +291,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -267,6 +305,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -279,6 +319,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -291,6 +333,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
 
@@ -302,45 +346,53 @@ piece.prototype.fMove = function(h, board){
       var blocked = false
       var j = 1
       //Top Right
-      for(var i = 1; i<7-this.x+1 && j<this.y+1; j++, i++){
+      for(var i = 1; i<7-this.x+1 && j<this.y+1 && !blocked; j++, i++){
         if(board[this.x+i][this.y-j].occ.length > 0){
           blocked = true
         }
         if(!blocked){
           append(possible, [this.x+i, this.y-j])
+        }else if(this.alliance != board[this.x+i][this.y-j].occ[0].alliance){
+          append(possible, [this.x+i, this.y-j, true])
         }
       }
       blocked = false
       //Top Left
       j=1
-      for(var i = 1; i<this.x+1 && j<this.y+1; j++, i++){
+      for(var i = 1; i<this.x+1 && j<this.y+1 && !blocked; j++, i++){
         if(board[this.x-i][this.y-j].occ.length > 0){
           blocked = true
         }
         if(!blocked){
           append(possible, [this.x-i, this.y-j])
+        }else if(this.alliance != board[this.x-i][this.y-j].occ[0].alliance){
+          append(possible, [this.x-i, this.y-j, true])
         }
       }
       blocked = false
       //Bottom Right
       j=1
-      for(var i = 1; i<7-this.x+1 && j<7-this.y+1; j++, i++){
+      for(var i = 1; i<7-this.x+1 && j<7-this.y+1 && !blocked; j++, i++){
         if(board[this.x+i][this.y+j].occ.length > 0){
           blocked = true
         }
         if(!blocked){
           append(possible, [this.x+i, this.y+j])
+        }else if(this.alliance != board[this.x+i][this.y+j].occ[0].alliance){
+          append(possible, [this.x+i, this.y+j, true])
         }
       }
       blocked = false
       //Bottom Left
       j=1
-      for(var i = 1; i<this.x+1 && j<7-this.y+1; j++, i++){
+      for(var i = 1; i<this.x+1 && j<7-this.y+1 && !blocked; j++, i++){
         if(board[this.x-i][this.y+j].occ.length > 0){
           blocked = true
         }
         if(!blocked){
           append(possible, [this.x-i, this.y+j])
+        }else if(this.alliance != board[this.x-i][this.y+j].occ[0].alliance){
+          append(possible, [this.x-i, this.y+j, true])
         }
       }
       return(possible)
@@ -357,6 +409,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [this.x-i, this.y])
+        }else if(this.alliance != board[this.x-i][this.y].occ[0].alliance){
+          append(possible, [this.x-i, this.y, true])
         }
       }
       blocked = false
@@ -367,6 +421,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [this.x+i, this.y])
+        }else if(this.alliance != board[this.x+i][this.y].occ[0].alliance){
+          append(possible, [this.x+i, this.y, true])
         }
       }
       blocked = false
@@ -377,6 +433,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [this.x, this.y-i])
+        }else if(this.alliance != board[this.x][this.y-i].occ[0].alliance){
+          append(possible, [this.x, this.y-i, true])
         }
       }
       blocked = false
@@ -387,6 +445,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [this.x, this.y+i])
+        }else if(this.alliance != board[this.x][this.y+i].occ[0].alliance){
+          append(possible, [this.x, this.y+i, true])
         }
       }
       blocked = false
@@ -394,45 +454,53 @@ piece.prototype.fMove = function(h, board){
       //---DIAGONAL---//
       var j = 1
       //Top Right
-      for(var i = 1; i<7-this.x+1 && j<this.y+1; j++, i++){
+      for(var i = 1; i<7-this.x+1 && j<this.y+1 && !blocked; j++, i++){
         if(board[this.x+i][this.y-j].occ.length > 0){
           blocked = true
         }
         if(!blocked){
           append(possible, [this.x+i, this.y-j])
+        }else if(this.alliance != board[this.x+i][this.y-j].occ[0].alliance){
+          append(possible, [this.x+i, this.y-j, true])
         }
       }
       blocked = false
       //Top Left
       j=1
-      for(var i = 1; i<this.x+1 && j<this.y+1; j++, i++){
+      for(var i = 1; i<this.x+1 && j<this.y+1 && !blocked; j++, i++){
         if(board[this.x-i][this.y-j].occ.length > 0){
           blocked = true
         }
         if(!blocked){
           append(possible, [this.x-i, this.y-j])
+        }else if(this.alliance != board[this.x-i][this.y-j].occ[0].alliance){
+          append(possible, [this.x-i, this.y-j, true])
         }
       }
       blocked = false
       //Bottom Right
       j=1
-      for(var i = 1; i<7-this.x+1 && j<7-this.y+1; j++, i++){
+      for(var i = 1; i<7-this.x+1 && j<7-this.y+1 && !blocked; j++, i++){
         if(board[this.x+i][this.y+j].occ.length > 0){
           blocked = true
         }
         if(!blocked){
           append(possible, [this.x+i, this.y+j])
+        }else if(this.alliance != board[this.x+i][this.y+j].occ[0].alliance){
+          append(possible, [this.x+i, this.y+j, true])
         }
       }
       blocked = false
       //Bottom Left
       j=1
-      for(var i = 1; i<this.x+1 && j<7-this.y+1; j++, i++){
+      for(var i = 1; i<this.x+1 && j<7-this.y+1 && !blocked; j++, i++){
         if(board[this.x-i][this.y+j].occ.length > 0){
           blocked = true
         }
         if(!blocked){
           append(possible, [this.x-i, this.y+j])
+        }else if(this.alliance != board[this.x-i][this.y+j].occ[0].alliance){
+          append(possible, [this.x-i, this.y+j, true])
         }
       }
 
@@ -454,6 +522,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -466,6 +536,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -478,6 +550,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -490,6 +564,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -502,6 +578,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -514,6 +592,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -526,6 +606,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       blocked = false
@@ -538,6 +620,8 @@ piece.prototype.fMove = function(h, board){
         }
         if(!blocked){
           append(possible, [xCoord, yCoord])
+        }else if(this.alliance != board[xCoord][yCoord].occ[0].alliance){
+          append(possible, [xCoord, yCoord, true])
         }
       }
       return (possible)
