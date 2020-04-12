@@ -15,6 +15,14 @@ function flipC(i,j) {
   }
 }
 
+function flipT(t){
+  if(t){
+    return false
+  }else {
+    return true
+  }
+}
+
 let board = []
 let allPieces = []
 //----Black----FALSE----//
@@ -34,8 +42,9 @@ let wQueen = new piece(3,7,'q',true)
 //----NonGameGlobals----//
 let locked = false
 let lLocked = false
+let turn = true
 let selected
-let move
+let move = -1
 //----SETUP STARTS----//
 function setup() {
   createCanvas(800, 800);
@@ -98,10 +107,10 @@ function setup() {
 //MOUSE RELEASED}
 function mouseReleased(){
   if(move.length > 1 && selected !== -1){
-    console.log("TEST")
     board[move[0]][move[1]].advance(selected)
     board[selected.x][selected.y].clear()
     selected.change(move)
+    turn = flipT(turn)
     move = -1
   }
 }
@@ -118,34 +127,44 @@ function draw() {
   }
   //SHOW ALL PIECES
   for (var i = 0; i < allPieces.length; i++){
-    if(mouseIsPressed){
-      if(allPieces[i].over(h) && !lLocked){
-        allPieces[i].selected = true
-        lLocked = true
+    if(allPieces[i].alive){
+      if(mouseIsPressed){
+        if(allPieces[i].over(h) && !lLocked){
+          allPieces[i].selected = true
+          lLocked = true
+        }
+      }else {
+        allPieces[i].selected = false
+        lLocked = false
       }
-    }else {
-      allPieces[i].selected = false
-      lLocked = false
-    }
-    if(lLocked){
-      allPieces[i].show(h, false)
-    }else {
-      allPieces[i].show(h, allPieces[i].over(h))
+      if(lLocked){
+        allPieces[i].show(h, false)
+      }else {
+        allPieces[i].show(h, allPieces[i].over(h))
+      }
     }
   }
 
   //------MOUSE ACTIONS------//
   if(mouseIsPressed){
     for(var i = 0; i < allPieces.length && !locked; i++){
-      if(allPieces[i].over(h)){
-        selected = allPieces[i]
-        locked = true
+     if(allPieces[i].alive){
+        if(allPieces[i].alliance === turn){
+          if(allPieces[i].over(h)){
+            selected = allPieces[i]
+            locked = true
+          }
+        }
       }
     }
     if(selected !== -1){
       var options = selected.fMove(h, board)
-      for(var j = 0; j<options.length; j++){
-        board[options[j][0]][options[j][1]].draw(h,color(0,255,255,150))
+      for(var i = 0; i<options.length; i++){
+        if(options[i][2] == true){
+          board[options[i][0]][options[i][1]].draw(h,color(255,0,0,110))
+        }else{
+          board[options[i][0]][options[i][1]].draw(h,color(0,255,255,150))
+        }
       }
       move = selected.request(options)
     }
@@ -153,5 +172,4 @@ function draw() {
     locked = false
     selected = -1
   }
-  //console.log(move)
-}
+}//DRAW ENDS
