@@ -14,7 +14,8 @@ spot.prototype.draw = function(h, c){
 }
 //array.shift() REMOVES FIRST ITEM IN ARRAY
 spot.prototype.advance = function(p){
-  if(this.occ.length > 0){
+  if(this.occ.length > 0){ //Capture
+    this.occ[0].alive = false
     this.occ.shift()
   }
   append(this.occ, p)
