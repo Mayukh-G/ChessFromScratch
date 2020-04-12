@@ -114,54 +114,58 @@ piece.prototype.fMove = function(h, board){
     var possible = []
     var blocked = false
       if(this.alliance){ //WHITE
-        if(board[this.x][this.y-1].occ.length > 0){
-          blocked = true
-        }
-        if (!blocked){
-          append(possible, [this.x, this.y-1])
-          if(this.y == 6){
-            if(board[this.x][this.y-2].occ.length > 0){
-              blocked = true
+        if(this.y-1 >= 0){
+          if(board[this.x][this.y-1].occ.length > 0){
+            blocked = true
+          }
+          if (!blocked){
+            append(possible, [this.x, this.y-1])
+            if(this.y == 6){
+              if(board[this.x][this.y-2].occ.length > 0){
+                blocked = true
+              }
+              if (!blocked){
+                append(possible, [this.x, this.y-2])
+              }
             }
-            if (!blocked){
-              append(possible, [this.x, this.y-2])
+          }//CAPTURE
+          if(this.x+1 <= 7){
+            if(board[this.x+1][this.y-1].occ.length > 0 && !board[this.x+1][this.y-1].occ[0].alliance){
+              append(possible, [this.x+1, this.y-1, true])
             }
           }
-        }//CAPTURE
-        if(this.x+1 <= 7){
-          if(board[this.x+1][this.y-1].occ.length > 0 && !board[this.x+1][this.y-1].occ[0].alliance){
-            append(possible, [this.x+1, this.y-1, true])
+          if(this.x-1 >= 0){
+            if (board[this.x-1][this.y-1].occ.length > 0 && !board[this.x-1][this.y-1].occ[0].alliance) {
+              append(possible, [this.x-1, this.y-1, true])
+            }
           }
-        }
-        if(this.x-1 >= 0){
-          if (board[this.x-1][this.y-1].occ.length > 0 && !board[this.x-1][this.y-1].occ[0].alliance) {
-            append(possible, [this.x-1, this.y-1, true])
-          }
-        }
+        }//TOP CHECK
       }
       else if (!this.alliance) { //BLACK
-        if(board[this.x][this.y+1].occ.length > 0){
-          blocked = true
-        }
-        if (!blocked){
-          append(possible, [this.x, this.y+1])
-          if(this.y == 1){
-            if(board[this.x][this.y+2].occ.length > 0){
-              blocked = true
+        if(this.y+1 <= 7){
+          if(board[this.x][this.y+1].occ.length > 0){
+            blocked = true
+          }
+          if (!blocked){
+            append(possible, [this.x, this.y+1])
+            if(this.y == 1){
+              if(board[this.x][this.y+2].occ.length > 0){
+                blocked = true
+              }
+              if (!blocked){
+                append(possible, [this.x, this.y+2])
+              }
             }
-            if (!blocked){
-              append(possible, [this.x, this.y+2])
+          }//CAPTURE
+          if(this.x+1 <= 7){
+            if(board[this.x+1][this.y+1].occ.length > 0 && board[this.x+1][this.y+1].occ[0].alliance){
+              append(possible, [this.x+1, this.y+1, true])
             }
           }
-        }//CAPTURE
-        if(this.x+1 <= 7){
-          if(board[this.x+1][this.y+1].occ.length > 0 && board[this.x+1][this.y+1].occ[0].alliance){
-            append(possible, [this.x+1, this.y+1, true])
-          }
-        }
-        if(this.x-1 >= 0){
-          if (board[this.x-1][this.y+1].occ.length > 0 && board[this.x-1][this.y+1].occ[0].alliance) {
-            append(possible, [this.x-1, this.y+1, true])
+          if(this.x-1 >= 0){
+            if (board[this.x-1][this.y+1].occ.length > 0 && board[this.x-1][this.y+1].occ[0].alliance) {
+              append(possible, [this.x-1, this.y+1, true])
+            }
           }
         }
       }
