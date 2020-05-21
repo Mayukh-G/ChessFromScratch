@@ -1,2 +1,3 @@
-# MG_Chess.github.io
-Chess for fun
+# CHESS from scratch
+- Very Much WIP, currently working on the game itself
+- Updates whenever I get time to do them
