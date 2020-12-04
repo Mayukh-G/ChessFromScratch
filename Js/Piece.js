@@ -50,8 +50,8 @@ piece.prototype.show = function(h, mouseover){
     fill(0)
   }
   if(mouseover || this.selected){
-    strokeWeight(3);
-    stroke(255,200,0);
+    strokeWeight(3)
+    stroke(255,200,0)
   }
   switch(this.type){ /* GHOST PROJECTION NOT TO BE USED OUTSIDE OF CLASS */
     case 'p':
@@ -86,11 +86,11 @@ piece.prototype.change = function(m){
 
 //ASK FOR MOVE
 piece.prototype.request = function(possible){
-  requestX = floor(8*mouseX/width)
-  requestY = floor(8*mouseY/width)
+  requestX = floor(8*mouseX/800)
+  requestY = floor(8*mouseY/800)
   for(var i = 0; i<possible.length; i++){
     if(possible[i][0] == requestX && possible[i][1] == requestY){
-      this.Ghost(width/8, [requestX, requestY])
+      this.Ghost(800/8, [requestX, requestY])
       return [requestX, requestY]
     }
   }
@@ -107,7 +107,7 @@ piece.prototype.over = function(h){
 }
 //------ TEST POSSIBLE movement spots
 //------------THIS SHOULD BE THE LAST FUNCTION ----------//
-piece.prototype.fMove = function(h, board){
+piece.prototype.fMove = function(board){
 
   switch(this.type){
     case 'p':
