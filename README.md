@@ -1,9 +1,9 @@
 # CHESS in p5.js
-This project is a game of chess written in JavaScript using the p5.js library
-[Game]: https://mayukh-g.github.io/ChessFromScratch/
+This project is a game of chess written in JavaScript using the p5.js library  
+[Game](https://mayukh-g.github.io/ChessFromScratch/)
 
 ### Features being worked on
-- [x] Movement
+- [x] [Movement](Move)
 - [x] Checks
 - [x] Captures
 - [x] Board
@@ -12,10 +12,10 @@ This project is a game of chess written in JavaScript using the p5.js library
 - [ ] Special moves (castle, en-passant)
 - [ ] More distinct Pieces
 
-Move
+[Move](#movement_anchor)
 ---
 ![move](readme_img/Moves.PNG)  
 
-Check
+Check/Sideboard
 ---
 ![check](readme_img/Check.PNG)
