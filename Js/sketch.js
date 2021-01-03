@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 
 function flipC(i,j) {
   if(i%2 == 0){
@@ -786,4 +786,3 @@ function draw() {
   }
   check() //CHECK FOR CHECK and CHECKMATE
 }
->>>>>>> 51c11aa... linked repo

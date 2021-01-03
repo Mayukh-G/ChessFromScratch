@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 class piece{
   constructor(x,y,type,al){
     this.x = x
@@ -1270,4 +1270,3 @@ piece.prototype.fMove = function(board){
       break;
   }
 }
->>>>>>> 51c11aa... linked repo

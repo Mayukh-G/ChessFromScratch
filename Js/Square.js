@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 class spot{
 
   constructor(x,y){
@@ -68,4 +68,3 @@ spot.prototype.advance = function(p){
 spot.prototype.clear = function(){
   this.occ.shift()
 }
->>>>>>> 51c11aa... linked repo
