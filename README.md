@@ -3,16 +3,16 @@ This project is a game of chess written in JavaScript using the p5.js library
 [Game](https://mayukh-g.github.io/ChessFromScratch/)
 
 ### Features being worked on
-- [x] [Movement](Move)
+- [x] [Movement](#move)
 - [x] Checks
 - [x] Captures
 - [x] Board
-- [x] Sideboard
+- [x] [Sideboard](#check/sideboard)
 - [x] Checkmates
 - [ ] Special moves (castle, en-passant)
 - [ ] More distinct Pieces
 
-[Move](#movement_anchor)
+Move
 ---
 ![move](readme_img/Moves.PNG)  
 
