@@ -39,26 +39,30 @@ function remove_covered_options(comparedList, allegiance){
     if(allPieces[i].alive && allPieces[i].alliance == allegiance){
       if(allPieces[i].type === 'p'){
         if(!allPieces[i].alliance){ //if black
-          if(allPieces[i].x+1 <= 7){
-            if(board[allPieces[i].x+1][allPieces[i].y+1].occ.length == 0 || !board[allPieces[i].x+1][allPieces[i].y+1].occ[0].alliance){
-              append(opt, [allPieces[i].x+1, allPieces[i].y+1, true])
+          if (allPieces[i].y + 1 <= 7){
+            if(allPieces[i].x + 1 <= 7){
+              if(board[allPieces[i].x+1][allPieces[i].y+1].occ.length == 0 || !board[allPieces[i].x+1][allPieces[i].y+1].occ[0].alliance){
+                append(opt, [allPieces[i].x+1, allPieces[i].y+1, true])
+              }
             }
-          }
-          if(allPieces[i].x-1 >= 0){
-            if (board[allPieces[i].x-1][allPieces[i].y+1].occ.length == 0 || !board[allPieces[i].x-1][allPieces[i].y+1].occ[0].alliance) {
-              append(opt, [allPieces[i].x-1, allPieces[i].y+1, true])
+            if(allPieces[i].x-1 >= 0){
+              if (board[allPieces[i].x-1][allPieces[i].y+1].occ.length == 0 || !board[allPieces[i].x-1][allPieces[i].y+1].occ[0].alliance) {
+                append(opt, [allPieces[i].x-1, allPieces[i].y+1, true])
+              }
             }
           }
         }
         if(allPieces[i].alliance){ //White
-          if(allPieces[i].x+1 <= 7){
-            if(board[allPieces[i].x+1][allPieces[i].y-1].occ.length == 0 || board[allPieces[i].x+1][allPieces[i].y-1].occ[0].alliance){
-              append(opt, [allPieces[i].x+1, allPieces[i].y-1, true])
+          if (allPieces[i].y - 1 >= 0){
+            if(allPieces[i].x+1 <= 7){
+              if(board[allPieces[i].x+1][allPieces[i].y-1].occ.length == 0 || board[allPieces[i].x+1][allPieces[i].y-1].occ[0].alliance){
+                append(opt, [allPieces[i].x+1, allPieces[i].y-1, true])
+              }
             }
-          }
-          if(allPieces[i].x-1 >= 0){
-            if (board[allPieces[i].x-1][allPieces[i].y-1].occ.length == 0 || board[allPieces[i].x-1][allPieces[i].y-1].occ[0].alliance) {
-              append(opt, [allPieces[i].x-1, allPieces[i].y-1, true])
+            if(allPieces[i].x-1 >= 0){
+              if (board[allPieces[i].x-1][allPieces[i].y-1].occ.length == 0 || board[allPieces[i].x-1][allPieces[i].y-1].occ[0].alliance) {
+                append(opt, [allPieces[i].x-1, allPieces[i].y-1, true])
+              }
             }
           }
         }
@@ -199,28 +203,30 @@ function check(){
   }
   //CHECKMATE
   if(wCheck || bCheck){
-    // TODO: BLOCKING CHECK (only check this after checking for king legal moves)
     let escape_options = find_safe_moves(dangerKing)
     blockingSpots = []
-    if (escape_options.length == 0){
-      possibleCheckmate = true
-      let pre_length
-      let post_length
-      let possible_blocking_spots = []
-      let threat_pos = [threat.x, threat.y, true]
-      if (!(threat.type == 'p') && !(threat.type == 'kn')){
-        possible_blocking_spots = find_possible_blocking_spots(threat, dangerKing)
-      }
-      append(possible_blocking_spots, threat_pos)
-      for (var i = 0; i < possible_blocking_spots.length; i++){ // copying array so it isn't affected by further changes
-        append(blockingSpots, possible_blocking_spots[i])
-      }
-      pre_length = possible_blocking_spots.length
-      remove_covered_options(possible_blocking_spots, !threat.alliance)
-      post_length = possible_blocking_spots.length + 1
 
-      return (post_length < pre_length || post_length == 1)
+    possibleCheckmate = true
+    let pre_length
+    let post_length
+    let possible_blocking_spots = []
+    let threat_pos = [threat.x, threat.y, true]
+    if (!(threat.type == 'p') && !(threat.type == 'kn')){
+      possible_blocking_spots = find_possible_blocking_spots(threat, dangerKing)
     }
+    append(possible_blocking_spots, threat_pos)
+    for (var i = 0; i < possible_blocking_spots.length; i++){ // copying array so it isn't affected by further changes
+      append(blockingSpots, possible_blocking_spots[i])
+    }
+    pre_length = possible_blocking_spots.length
+    dangerKing.alive = false
+    board[dangerKing.x][dangerKing.y].clear()
+    remove_covered_options(possible_blocking_spots, !threat.alliance)
+    dangerKing.alive = true
+    append(board[dangerKing.x][dangerKing.y].occ, dangerKing)
+    post_length = possible_blocking_spots.length
+
+    return !(post_length < pre_length)
   }
 }
 
@@ -469,7 +475,7 @@ function draw() {
       if (selected.type == 'k'){
         options = find_safe_moves(selected)
       }else {
-        if (possibleCheckmate){ //TODO: YOu can still move other peices when king is in check. Change this
+        if (wCheck || bCheck){ //TODO: YOu can still move other peices when king is in check. Change this
           options = save_matching_options(blockingSpots, selected.fMove(board))
           blockingSpots = -1
           possibleCheckmate = false
@@ -490,7 +496,8 @@ function draw() {
     locked = false
     selected = -1
   }
-  if(check()){ //CHECK FOR CHECK and CHECKMATE
+  // Mouse actions end
+  if(check()){ // CHECK FOR CHECK and CHECKMATE
     console.log("CHECKMATE")
   }
 }
