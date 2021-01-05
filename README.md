@@ -11,7 +11,7 @@ This project is a game of chess written in JavaScript using the p5.js library
 - [x] Board
 - [x] [Sideboard](#sideboard)
 - [x] Checkmates
-- [ ] Special moves (castle, en-passant)
+- [ ] Special moves (castle, en-passant, promotion)
 - [ ] More distinct Pieces
 
 Move

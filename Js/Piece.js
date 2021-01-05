@@ -1,6 +1,6 @@
 
 class piece{
-  constructor(x,y,type,al){
+  constructor(x, y, type, al){
     this.x = x
     this.y = y
     this.type = type

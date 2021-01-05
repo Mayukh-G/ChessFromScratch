@@ -9,6 +9,22 @@ function flipT(t){
   return null
 }
 
+function save_matching_options(comparedList, possibleMoves){
+  /*
+  Takes two arrays of coordinates. Compares the two arrays and retuns an array
+  of coordiantes that are found in both lists
+  */
+  let temp_set = new Set()
+  for (var i = 0; i < possibleMoves.length; i++){
+    for (var j = 0; j < comparedList.length; j++){
+      if (board[possibleMoves[i][0]][possibleMoves[i][1]] == board[comparedList[j][0]][comparedList[j][1]]){
+        temp_set.add(possibleMoves[i])
+      }
+    }
+  }
+  return [...temp_set]
+}
+
 function remove_covered_options(comparedList, allegiance){
   /*
   Checks if spot objects on the board that are in the array are being
@@ -62,7 +78,7 @@ function remove_covered_options(comparedList, allegiance){
   }
 } // end of function
 
-function find_legal_moves(pieceChecked){
+function find_safe_moves(pieceChecked){
   /*
   Finds all legal moves for a piece and returns and array with those moves
   pieceChecked : Piece object
@@ -101,7 +117,56 @@ function find_legal_moves(pieceChecked){
   return run_away
 }
 
-function check(){ //CHECK for checks
+function find_possible_blocking_spots(threatning, king){
+  /*
+  Finds all possible spots where a check block could occur
+  returns an array of the spots.
+  */
+  let type = threatning.type
+  let start = [king.x, king.y]
+  let stop = [threatning.x, threatning.y]
+  let returnArr = []
+  let direction
+
+  if(stop[0] < start[0]){
+    if (stop[1] < start[1]){
+      direction = [-1, -1] // bL
+    }else if (stop[1] > start[1]) {
+      direction = [-1, 1] // tL
+    }else {
+      direction = [-1, 0] // L
+    }
+  }else if (stop[0] > start[0]){
+    if (stop[1] < start[1]){
+      direction = [1, -1] //bR
+    }else if (stop[1] > start[1]){
+      direction = [1, 1] //tR
+    }else {
+      direction = [1, 0] //R
+    }
+  }else {
+    if (stop[1] < start[1]){
+      direction = [0, -1] //b
+    }else if (stop[1] > start[1]){
+      direction = [0, 1] //t
+    }
+  }
+  for (i = 0; !(start[0] == stop[0] && start[1] == stop[1]); i++){
+    append(returnArr, [start[0], start[1]])
+    start[0] += direction[0]
+    start[1] += direction[1]
+  }
+  returnArr.shift()
+  return returnArr
+}
+
+function check(){
+  /**
+  Checks the board state to verify for a check. If there is one verifies if the
+  check state is actually a checkmate state.
+
+  Returns: true if checkmate, false if no checkmate
+  */
   let bCount = 0
   let wCount = 0
   let threat
@@ -122,12 +187,12 @@ function check(){ //CHECK for checks
       }
     }
   }
-  if(wCount>0){
+  if(wCount > 0){ // Mainly used for sideBoard
     wCheck = true
   }else {
     wCheck = false
   }
-  if(bCount>0){
+  if(bCount > 0){
     bCheck = true
   }else {
     bCheck = false
@@ -135,8 +200,27 @@ function check(){ //CHECK for checks
   //CHECKMATE
   if(wCheck || bCheck){
     // TODO: BLOCKING CHECK (only check this after checking for king legal moves)
-    let escape_options = find_legal_moves(dangerKing)
-    console.log(escape_options)
+    let escape_options = find_safe_moves(dangerKing)
+    blockingSpots = []
+    if (escape_options.length == 0){
+      possibleCheckmate = true
+      let pre_length
+      let post_length
+      let possible_blocking_spots = []
+      let threat_pos = [threat.x, threat.y, true]
+      if (!(threat.type == 'p') && !(threat.type == 'kn')){
+        possible_blocking_spots = find_possible_blocking_spots(threat, dangerKing)
+      }
+      append(possible_blocking_spots, threat_pos)
+      for (var i = 0; i < possible_blocking_spots.length; i++){ // copying array so it isn't affected by further changes
+        append(blockingSpots, possible_blocking_spots[i])
+      }
+      pre_length = possible_blocking_spots.length
+      remove_covered_options(possible_blocking_spots, !threat.alliance)
+      post_length = possible_blocking_spots.length + 1
+
+      return (post_length < pre_length || post_length == 1)
+    }
   }
 }
 
@@ -262,8 +346,10 @@ let lLocked = false
 let turn = true
 let wCheck = false
 let bCheck = false
+let possibleCheckmate = false
 let selected
 let options
+let blockingSpots = -1
 let move = -1
 //----SETUP STARTS----//
 function setup() {
@@ -380,10 +466,16 @@ function draw() {
       }
     }
     if(selected !== -1){
-      if (selected.type =='k'){
-        options = find_legal_moves(selected)
+      if (selected.type == 'k'){
+        options = find_safe_moves(selected)
       }else {
-        options = selected.fMove(board)
+        if (possibleCheckmate){ //TODO: YOu can still move other peices when king is in check. Change this
+          options = save_matching_options(blockingSpots, selected.fMove(board))
+          blockingSpots = -1
+          possibleCheckmate = false
+        }else {
+          options = selected.fMove(board)
+        }
       }
       for(var i = 0; i<options.length; i++){
         if(options[i][2] == true){
@@ -398,5 +490,7 @@ function draw() {
     locked = false
     selected = -1
   }
-  check() //CHECK FOR CHECK and CHECKMATE
+  if(check()){ //CHECK FOR CHECK and CHECKMATE
+    console.log("CHECKMATE")
+  }
 }
