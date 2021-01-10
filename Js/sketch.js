@@ -9,6 +9,31 @@ function flipT(t){
   return null
 }
 
+function shallow_copy(){
+  /**
+  Makes a shallow copy of a board. changes to this board will not affect the
+  original board. returns the shallow copy
+  */
+  let copy_board = []
+  let copy_all_pieces = []
+  let copy_pieces
+  for (var i = 0; i < 8; i++){
+    copy_board[i] = new Array(8)
+  }
+
+  for (var i = 0; i < 8; i++){
+    for(var j = 0; j < 8; j++){
+      copy_board[i][j] = new spot(board[i][j].x, board[i][j].y)
+      if(board[i][j].occ.length !== 0){
+        copy_pieces = new piece(board[i][j].occ[0].x, board[i][j].occ[0].y, board[i][j].occ[0].type, board[i][j].occ[0].alliance)
+        append(copy_all_pieces, copy_pieces)
+        append(copy_board[i][j].occ, copy_pieces)
+      }
+    }
+  }
+  return [copy_board, copy_all_pieces]
+}
+
 function save_matching_options(comparedList, possibleMoves){
   /*
   Takes two arrays of coordinates. Compares the two arrays and retuns an array
@@ -164,10 +189,16 @@ function find_possible_blocking_spots(threatning, king){
   return returnArr
 }
 
-function check(){
+function check(simulate, board_to_analyze, piece_list){
   /**
   Checks the board state to verify for a check. If there is one verifies if the
-  check state is actually a checkmate state.
+  check state is actually a checkmate state. The option to simulate does not go
+  further than changing wCheck or bCheck. The board that is being analyzed must
+  also be passed in along with a list of peice objects representing every peice
+  on the board. This is to make sure during a simulation the real board is
+  not being changed.
+
+  To create a simulation board utilize shallow_copy()
 
   Returns: true if checkmate, false if no checkmate
   */
@@ -175,14 +206,14 @@ function check(){
   let wCount = 0
   let threat
   let dangerKing
-  for(var i = 0; i<allPieces.length; i++){
-    if(allPieces[i].alive){
-      let opt = allPieces[i].fMove(board)
+  for(var i = 0; i < piece_list.length; i++){
+    if(piece_list[i].alive){
+      let opt = piece_list[i].fMove(board_to_analyze)
       for(var j = 0; j<opt.length; j++){
-        if(opt[j][2] && board[opt[j][0]][opt[j][1]].occ[0].type == 'k'){
-          threat = allPieces[i]
-          dangerKing = board[opt[j][0]][opt[j][1]].occ[0]
-          if(board[opt[j][0]][opt[j][1]].occ[0].alliance){
+        if(opt[j][2] && board_to_analyze[opt[j][0]][opt[j][1]].occ[0].type == 'k'){
+          threat = piece_list[i]
+          dangerKing = board_to_analyze[opt[j][0]][opt[j][1]].occ[0]
+          if(board_to_analyze[opt[j][0]][opt[j][1]].occ[0].alliance){
             wCount++
           }else{
             bCount++
@@ -202,7 +233,7 @@ function check(){
     bCheck = false
   }
   //CHECKMATE
-  if(wCheck || bCheck){
+  if((wCheck || bCheck) && !simulate){
     let escape_options = find_safe_moves(dangerKing)
     blockingSpots = []
 
@@ -215,19 +246,84 @@ function check(){
       possible_blocking_spots = find_possible_blocking_spots(threat, dangerKing)
     }
     append(possible_blocking_spots, threat_pos)
-    for (var i = 0; i < possible_blocking_spots.length; i++){ // copying array so it isn't affected by further changes
-      append(blockingSpots, possible_blocking_spots[i])
-    }
+    blockingSpots = [...possible_blocking_spots] // copying array so it isn't affected by further changes
     pre_length = possible_blocking_spots.length
     dangerKing.alive = false
-    board[dangerKing.x][dangerKing.y].clear()
+    board_to_analyze[dangerKing.x][dangerKing.y].clear()
     remove_covered_options(possible_blocking_spots, !threat.alliance)
     dangerKing.alive = true
-    append(board[dangerKing.x][dangerKing.y].occ, dangerKing)
+    append(board_to_analyze[dangerKing.x][dangerKing.y].occ, dangerKing)
     post_length = possible_blocking_spots.length
 
     return !(post_length < pre_length)
   }
+}
+
+function check_if_pinned(potentially_pinned){
+  // JUST REMOVING DOES NOT WORK. CHECK EVERY REASONABLE POSSIBLE MOVE,
+  // IE. If moving 1 to the right resuts in a check make sure you dont keep checking that direction
+  /**
+  Simulates the removal of a peice and runs the check function, if a check state
+  occurs for the allied king, the peice is considered pinned.
+  *** It is vital that all variables modified here are reset ! ***
+  returns True if the peice is pinned, false if it is not.
+  */
+  const pre_change_w_check = wCheck
+  const pre_change_b_check = bCheck
+  const side = potentially_pinned.alliance
+  const original_spot = [potentially_pinned.x, potentially_pinned.y]
+  let return_state
+  wCheck = false
+  bCheck = false
+
+  potentially_pinned.alive = false // Remove peice
+  board[potentially_pinned.x][potentially_pinned.y].clear()
+
+  check(simulate=true, board, allPieces) // Run check
+
+  potentially_pinned.alive = true // Return peice
+  append(board[potentially_pinned.x][potentially_pinned.y].occ, potentially_pinned)
+
+  // Verify that the correct side got checked
+  if (wCheck && side) { return_state = true }
+  else if (bCheck && !side) { return_state = true }
+  else { return_state = false }
+
+  // Finding moves that a peice can make while pinned
+  // making copies so the real board state is not affected
+  let allowed_pinned_moves = []
+  let movement = []
+  if ((wCheck && side) || (bCheck && !side)){
+    let copied_return
+    let board_copy
+    let all_pieces_copy
+    let copy_piece
+    movement = potentially_pinned.fMove(board)
+    for (var i = 0; i < movement.length; i++){
+      copied_return = shallow_copy()
+      board_copy = copied_return[0]
+      all_pieces_copy = copied_return[1]
+      copy_piece = board_copy[potentially_pinned.x][potentially_pinned.y].occ[0]
+
+      wCheck = false
+      bCheck = false
+
+      board_copy[movement[i][0]][movement[i][1]].advance(copy_piece)
+      board_copy[copy_piece.x][copy_piece.y].clear()
+      copy_piece.change(movement[i])
+
+      check(simulate=true, board_copy, all_pieces_copy)
+
+      if (!(wCheck && side) && !(bCheck && !side)){
+        append(allowed_pinned_moves, movement[i])
+      }
+    }
+  }
+
+  // Resetting globals that were changed
+  wCheck = pre_change_w_check
+  bCheck = pre_change_b_check
+  return [return_state, allowed_pinned_moves]
 }
 
 function sideBoard(all){ // Draws the side board
@@ -475,11 +571,15 @@ function draw() {
       if (selected.type == 'k'){
         options = find_safe_moves(selected)
       }else {
+        let pinned = check_if_pinned(selected)
+        if (pinned[0]){ // Verify that the peice is not pinned
+          options = pinned[1]
+        }
         if (wCheck || bCheck){ //TODO: YOu can still move other peices when king is in check. Change this
           options = save_matching_options(blockingSpots, selected.fMove(board))
           blockingSpots = -1
           possibleCheckmate = false
-        }else {
+        }else if (!pinned[0]){
           options = selected.fMove(board)
         }
       }
@@ -497,7 +597,7 @@ function draw() {
     selected = -1
   }
   // Mouse actions end
-  if(check()){ // CHECK FOR CHECK and CHECKMATE
+  if(check(simulate=false, board, allPieces)){ // CHECK FOR CHECK and CHECKMATE
     console.log("CHECKMATE")
   }
 }
